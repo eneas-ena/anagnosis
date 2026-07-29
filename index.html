@@ -167,13 +167,51 @@ select:focus{outline:none;border-color:var(--gold)}
 .rot{font-family:'Cinzel',serif;font-size:calc(10.5px*var(--e));letter-spacing:.09em;color:var(--gold);text-transform:uppercase;margin-bottom:5px}
 .codigo{font-family:ui-monospace,Menlo,monospace;font-size:calc(12px*var(--e));color:var(--dim)}
 
+/* tradução e caderno */
+.iconesTopo{position:absolute;right:12px;top:calc(14px + env(safe-area-inset-top));display:flex;gap:2px}
+.iconesTopo button{background:none;border:none;padding:8px 9px;font-size:calc(18px*var(--e));cursor:pointer;line-height:1;color:var(--gold);font-family:'Cormorant Garamond',serif}
+.niveis{display:flex;gap:7px;margin-bottom:16px}
+.niveis button{flex:1;padding:11px 4px;font-size:calc(11px*var(--e));border-color:var(--linha);color:var(--dim)}
+.niveis button.on{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:600}
+.palT{display:inline-flex;flex-direction:column;align-items:center;padding:4px 6px;min-width:52px}
+.palT .o{font-size:calc(25px*var(--e));line-height:1.5}
+.palT .o.hb{font-family:'Frank Ruhl Libre','SBL Hebrew',serif}
+.palT .x{font-size:calc(11px*var(--e));color:var(--dim);line-height:1.35;direction:ltr;text-align:center}
+.palT .lm{font-size:calc(12.5px*var(--e));color:var(--gold);line-height:1.35;direction:ltr}
+textarea{
+  width:100%;min-height:130px;padding:13px;background:var(--sup2);color:var(--ink);
+  border:1px solid var(--linha);border-radius:8px;font-family:inherit;
+  font-size:calc(17px*var(--e));line-height:1.55;resize:vertical;
+}
+textarea:focus{outline:none;border-color:var(--gold)}
+.critica h3{
+  font-family:'Cinzel',serif;font-size:calc(11.5px*var(--e));letter-spacing:.09em;
+  color:var(--gold);text-transform:uppercase;margin:20px 0 7px;font-weight:600;
+}
+.critica h3:first-child{margin-top:0}
+.critica p{margin:0 0 10px}
+.critica .frag{border-left:2px solid var(--vermelho);padding-left:14px}
+.itemCad{
+  background:var(--sup);border:1px solid var(--linha);border-radius:10px;
+  padding:14px 16px;margin-bottom:10px;cursor:pointer;
+}
+.itemCad .ref{font-family:'Cinzel',serif;font-size:calc(11.5px*var(--e));color:var(--gold);letter-spacing:.07em}
+.itemCad .prev{color:var(--dim);font-size:calc(15px*var(--e));margin-top:4px}
+.busca{width:100%;padding:11px 13px;background:var(--sup2);color:var(--ink);border:1px solid var(--linha);border-radius:8px;font-family:inherit;font-size:calc(16px*var(--e));margin-bottom:16px}
+.busca:focus{outline:none;border-color:var(--gold)}
+.btnTrad{background:none;border:1px solid var(--linha);color:var(--dim);border-radius:99px;padding:3px 12px;font-size:calc(10px*var(--e));margin-left:9px;vertical-align:middle}
+
+
 </style>
 </head>
 <body>
 
 <div class="topo">
   <h1>ANAGNOSIS</h1>
-  <button class="tema" id="btnTema" onclick="trocarTema()" title="Alternar tema">☾</button>
+  <div class="iconesTopo">
+    <button onclick="aba('alfabeto')" title="Alfabeto">Αא</button>
+    <button id="btnTema" onclick="trocarTema()" title="Tema">☾</button>
+  </div>
 </div>
 
 <!-- HOJE -->
@@ -283,6 +321,35 @@ select:focus{outline:none;border-color:var(--gold)}
   <div id="texto"><p class="carregando">Escolha um livro.</p></div>
 </div>
 
+
+<!-- TRADUZIR -->
+<div class="tela" id="t-traduzir">
+  <div class="vnum" id="tRef" style="margin-bottom:14px">—</div>
+  <div class="niveis">
+    <button id="nv-guiado" onclick="nivelTrad('guiado')">GUIADO</button>
+    <button id="nv-apoio" class="on" onclick="nivelTrad('apoio')">COM APOIO</button>
+    <button id="nv-cego" onclick="nivelTrad('cego')">ÀS CEGAS</button>
+  </div>
+  <div class="card" id="tTexto" style="padding:20px 16px"></div>
+  <div class="card">
+    <h2>Sua tradução</h2>
+    <textarea id="tMinha" placeholder="Escreva aqui, sem consultar versão nenhuma."></textarea>
+    <button class="solid largo" style="margin-top:12px" id="tEnviar" onclick="pedirCritica()">Enviar para crítica</button>
+  </div>
+  <div class="card critica" id="tCritica" style="display:none"></div>
+  <button class="suave largo" onclick="aba('ler')">Voltar ao texto</button>
+</div>
+
+<!-- CADERNO -->
+<div class="tela" id="t-caderno">
+  <input class="busca" id="buscaCad" placeholder="Buscar por referência ou palavra…" oninput="pintarCaderno()">
+  <div id="listaCad"><p class="carregando">Carregando…</p></div>
+  <div id="detalheCad" style="display:none">
+    <button class="suave largo" style="margin-bottom:16px" onclick="voltarCaderno()">Voltar à lista</button>
+    <div id="detCorpo"></div>
+  </div>
+</div>
+
 <!-- AJUSTES -->
 <div class="tela" id="t-ajustes">
   <div class="card">
@@ -319,6 +386,18 @@ select:focus{outline:none;border-color:var(--gold)}
     <p class="mini dim" style="margin:0">As vozes disponíveis são de grego e hebraico <em>modernos</em>. No hebraico isso se aproxima bem da pronúncia sefardita usada nos seminários. No grego, afasta-se do erasmiano: β soa como v, e η, ι, υ, ει, οι soam todos como i. Use para o ritmo e a silabação, não como padrão de pronúncia koiné.</p>
   </div>
   <div class="card">
+    <h2>Crítica de tradução</h2>
+    <div class="campo" style="margin-bottom:0">
+      <label>Endereço do Worker</label>
+      <select id="cfgWorker" onchange="salvarCfg()">
+        <option value="https://promptflow-ia.eneaspr.workers.dev">promptflow-ia</option>
+        <option value="https://atlas-profecias.eneaspr.workers.dev">atlas-profecias</option>
+        <option value="https://tkl-api.eneaspr.workers.dev">tkl-api</option>
+      </select>
+      <p class="mini dim" style="margin:8px 0 0">Qualquer Worker seu que faça ponte com a API da Anthropic serve.</p>
+    </div>
+  </div>
+  <div class="card">
     <h2>Diagnóstico</h2>
     <p class="mini dim" style="margin-top:0">Refazer recalibra o ponto de partida e substitui todo o progresso atual.</p>
     <button class="largo" onclick="abrirDiagnostico()">Refazer o diagnóstico</button>
@@ -333,7 +412,7 @@ select:focus{outline:none;border-color:var(--gold)}
   <button class="on" data-t="hoje" onclick="aba('hoje')">HOJE</button>
   <button data-t="estudar" onclick="aba('estudar')">CARTÕES</button>
   <button data-t="ler" onclick="aba('ler')">LER</button>
-  <button data-t="alfabeto" onclick="aba('alfabeto')">ALFABETO</button>
+  <button data-t="caderno" onclick="aba('caderno')">CADERNO</button>
   <button data-t="ajustes" onclick="aba('ajustes')">AJUSTES</button>
 </div>
 
@@ -352,7 +431,7 @@ const hoje = () => new Date().toISOString().slice(0,10);
 const somaDias = (d,n) => { const x=new Date(d+'T12:00:00'); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); };
 
 let LEMAS=[], PROG={}, SEQ=0;
-let CFG = { trilha:'G', novas:8, escala:1.25, tema:'escuro', translit:true };
+let CFG = { trilha:'G', novas:8, escala:1.25, tema:'escuro', translit:true, worker:'https://promptflow-ia.eneaspr.workers.dev' };
 let fila=[], atual=null, feitos=0;
 let dFila=[], dPos=0, dResp=[];
 
@@ -420,18 +499,19 @@ function aba(nome){
   if(nome==='ajustes'){ mostrarResumo(); carregarVozes(); }
   if(nome==='alfabeto' && !$('alfaCorpo').innerHTML) alfabeto('H');
   if(nome==='ler') iniciarLeitor();
+  if(nome==='caderno'){ voltarCaderno(); carregarCaderno(); }
 }
 function guardar(){ try{ localStorage.setItem('anagnosis_cfg', JSON.stringify(CFG)); }catch(e){} }
 function salvarCfg(){
   CFG.trilha=$('cfgTrilha').value; CFG.novas=+$('cfgNovas').value; CFG.escala=+$('cfgEscala').value;
-  CFG.translit=$('cfgTranslit').checked;
+  CFG.translit=$('cfgTranslit').checked; CFG.worker=$('cfgWorker').value;
   document.documentElement.style.setProperty('--e', CFG.escala);
   guardar(); pintarHoje();
 }
 function lerCfg(){
   try{ const c=JSON.parse(localStorage.getItem('anagnosis_cfg')); if(c) CFG={...CFG,...c}; }catch(e){}
   $('cfgTrilha').value=CFG.trilha; $('cfgNovas').value=CFG.novas; $('cfgEscala').value=CFG.escala;
-  $('cfgTranslit').checked=CFG.translit;
+  $('cfgTranslit').checked=CFG.translit; $('cfgWorker').value=CFG.worker;
   document.documentElement.style.setProperty('--e', CFG.escala);
   aplicarTema();
 }
@@ -655,7 +735,8 @@ function desenharCap(){
   if(!versos.length){ $('texto').innerHTML = '<p class="carregando">Este capítulo não tem texto no banco.</p>'; return; }
   let h = '';
   for(const v of versos){
-    h += `<div class="verso"><div class="vnum">${LIVROATUAL.nome} ${$('selCap').value}:${v}</div>`;
+    h += `<div class="verso"><div class="vnum">${LIVROATUAL.nome} ${$('selCap').value}:${v}`
+       + `<button class="btnTrad" onclick="event.stopPropagation();abrirTraducao(${v})">traduzir</button></div>`;
     h += `<div class="linha${hb?' rtl':''}">`;
     CAPATUAL[v].forEach((p,i) => {
       const ch = chaveDe(p.sfull);
@@ -718,6 +799,221 @@ async function registrarLeitura(n){
       method:'POST', headers:{...H(), Prefer:'resolution=merge-duplicates'},
       body: JSON.stringify([{dia:hoje(), versiculos:n}])});
   }catch(e){}
+}
+
+
+/* ═══════════ FASE 3 — TRADUÇÃO E CADERNO ═══════════ */
+let TRAD = { vers:null, palavras:[], nivel:'apoio', ref:'' };
+let CADERNO = [];
+
+function abrirTraducao(v){
+  TRAD.vers = v;
+  TRAD.palavras = CAPATUAL[v] || [];
+  TRAD.ref = `${LIVROATUAL.nome} ${$('selCap').value}:${v}`;
+  $('tRef').textContent = TRAD.ref;
+  $('tMinha').value = '';
+  $('tCritica').style.display = 'none';
+  $('tEnviar').disabled = false;
+  $('tEnviar').textContent = 'Enviar para crítica';
+  nivelTrad(TRAD.nivel);
+  aba('traduzir');
+}
+
+function nivelTrad(n){
+  TRAD.nivel = n;
+  ['guiado','apoio','cego'].forEach(k => $('nv-'+k).classList.toggle('on', k===n));
+  const hb = LIVROATUAL && LIVROATUAL.idioma !== 'grc';
+  let h = `<div class="linha${hb?' rtl':''}" style="gap:2px 8px">`;
+  TRAD.palavras.forEach(p => {
+    const ch = chaveDe(p.sfull);
+    const lem = ch ? LEMAS.find(l => l.chave === ch) : null;
+    h += `<span class="palT"><span class="o${hb?' hb':''}">${p.heb||''}</span>`;
+    if(n !== 'cego') h += `<span class="x">${p.tr||''}</span>`;
+    if(n === 'guiado' && lem) h += `<span class="lm">${lem.glosa||''}</span>`;
+    h += `</span>`;
+  });
+  h += '</div>';
+  if(n === 'cego') h += `<p class="mini dim" style="margin:14px 0 0;text-align:center">Sem apoio. É a prova real.</p>`;
+  $('tTexto').innerHTML = h;
+}
+
+function textoOriginal(){
+  return TRAD.palavras.map(p => p.heb).join(' ');
+}
+
+function dossie(){
+  const hb = LIVROATUAL && LIVROATUAL.idioma !== 'grc';
+  return TRAD.palavras.map((p,i) => {
+    const ch = chaveDe(p.sfull);
+    const lem = ch ? LEMAS.find(l => l.chave === ch) : null;
+    const mf = traduzMorf(p.morph);
+    return `${i+1}. ${p.heb} | translit: ${p.tr||'—'} | lema: ${lem?lem.lema:'—'}`
+         + ` | glosa: ${lem?lem.glosa:'—'} | morfologia: ${mf.texto||'—'} (${mf.bruto||'—'})`
+         + ` | glosa contextual: ${p.pt||'—'}`;
+  }).join('\n');
+}
+
+const INSTRUCAO = `Você é um professor de exegese avaliando a tradução de um aluno adulto e experiente — pastor com formação teológica, retomando as línguas originais depois de anos afastado.
+
+A ficha morfológica abaixo vem de um corpus etiquetado. ANCORE TODA a sua análise nela. Não invente formas, parsings ou sentidos que não estejam nos dados fornecidos. Se algo for incerto, diga que é incerto.
+
+Avalie a tradução do aluno em sete seções, cada uma iniciada por "## " seguido do título exato:
+
+## Leitura geral
+Duas ou três frases sobre se a tradução funciona como português e se o sentido central foi captado.
+
+## Escolhas lexicais
+Onde cada palavra escolhida cai dentro da amplitude semântica do termo original. O que outra escolha mudaria.
+
+## Morfologia
+O tempo, aspecto, voz e modo foram honrados? Aoristo, perfeito, particípio, wayyiqtol, estado construto — o que sobreviveu e o que se perdeu.
+
+## Sintaxe
+Relações entre as palavras: genitivo subjetivo ou objetivo, função dos particípios, encadeamento das orações.
+
+## Acréscimos e omissões
+O que o aluno pôs e não está no original; o que está no original e sumiu — partículas, pronomes enfáticos, ordem enfática das palavras.
+
+## Onde os tradutores divergem
+Pontos deste versículo em que versões respeitáveis discordam legitimamente, e com que consequência.
+
+## A decisão mais frágil
+OBRIGATÓRIO. Aponte sempre a escolha mais vulnerável da tradução, mesmo quando o conjunto estiver bom. Nunca escreva que está tudo perfeito. Se a tradução for excelente, aponte a decisão que um revisor questionaria primeiro. Esta seção jamais pode ser omitida ou suavizada.
+
+Regras de tom: seja direto e específico, sem elogio genérico. Cite o texto original quando for útil. Não pressuponha nem promova nenhuma posição teológica ou escola de interpretação — analise o que o texto diz, não o que uma tradição espera que ele diga. Português do Brasil. Sem preâmbulo: comece direto em "## Leitura geral".`;
+
+async function pedirCritica(){
+  const minha = $('tMinha').value.trim();
+  if(minha.length < 8) return toast('Escreva sua tradução antes de enviar.');
+
+  $('tEnviar').disabled = true;
+  $('tEnviar').textContent = 'Analisando…';
+  $('tCritica').style.display = 'block';
+  $('tCritica').innerHTML = '<p class="carregando">Lendo sua tradução decisão por decisão…</p>';
+
+  const idioma = (LIVROATUAL && LIVROATUAL.idioma !== 'grc') ? 'Hebraico bíblico' : 'Grego koiné';
+  const corpo = `${INSTRUCAO}
+
+---
+REFERÊNCIA: ${TRAD.ref}
+IDIOMA: ${idioma}
+TEXTO ORIGINAL: ${textoOriginal()}
+
+FICHA MORFOLÓGICA (palavra por palavra, na ordem do original):
+${dossie()}
+
+TRADUÇÃO DO ALUNO:
+"${minha}"
+
+Analise agora.`;
+
+  try{
+    const r = await fetch(CFG.worker, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-5', max_tokens:3000,
+        system:'Você é um professor de exegese bíblica. Responda em português do Brasil.',
+        messages:[{ role:'user', content: corpo }]
+      })
+    });
+    if(!r.ok) throw new Error('Worker respondeu ' + r.status);
+    const d = await r.json();
+    const txt = (d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+    if(!txt) throw new Error('resposta vazia');
+
+    $('tCritica').innerHTML = formatarCritica(txt);
+    await salvarTraducao(minha, txt);
+    $('tEnviar').textContent = 'Analisado e guardado';
+  }catch(e){
+    $('tCritica').innerHTML = `<p class="dim">Não consegui obter a crítica.<br><span class="mini">${e.message}</span></p>`;
+    $('tEnviar').disabled = false;
+    $('tEnviar').textContent = 'Tentar de novo';
+  }
+}
+
+function formatarCritica(t){
+  const linhas = t.split('\n');
+  let h = '', frag = false;
+  for(const l of linhas){
+    const m = l.match(/^##\s*(.+)$/);
+    if(m){
+      frag = /frágil/i.test(m[1]);
+      h += `<h3>${m[1].trim()}</h3>`;
+      if(frag) h += '<div class="frag">';
+      continue;
+    }
+    if(l.trim()) h += `<p>${l.trim()}</p>`;
+  }
+  if(frag) h += '</div>';
+  return h;
+}
+
+async function salvarTraducao(minha, critica){
+  try{
+    await fetch(`${SUPA_URL}/rest/v1/traducoes`, {
+      method:'POST', headers:{...H(), Prefer:'return=minimal'},
+      body: JSON.stringify([{
+        idioma: (LIVROATUAL.idioma!=='grc') ? 'H' : 'G',
+        livro: LIVROATUAL.livro, referencia: TRAD.ref,
+        cap: +$('selCap').value, vers: TRAD.vers, nivel: TRAD.nivel,
+        original: textoOriginal(), minha, critica
+      }])});
+    CADERNO = [];
+  }catch(e){ toast('A crítica saiu, mas não consegui guardar no caderno.'); }
+}
+
+/* ── caderno ── */
+async function carregarCaderno(){
+  if(CADERNO.length) return pintarCaderno();
+  $('listaCad').innerHTML = '<p class="carregando">Carregando…</p>';
+  try{
+    const r = await fetch(`${SUPA_URL}/rest/v1/traducoes?select=*&order=criado_em.desc&limit=300`, {headers:H()});
+    CADERNO = await r.json();
+    pintarCaderno();
+  }catch(e){ $('listaCad').innerHTML = '<p class="carregando">Falha ao carregar o caderno.</p>'; }
+}
+
+function pintarCaderno(){
+  const q = ($('buscaCad').value||'').toLowerCase().trim();
+  const lista = q ? CADERNO.filter(t =>
+        (t.referencia||'').toLowerCase().includes(q) ||
+        (t.minha||'').toLowerCase().includes(q) ||
+        (t.critica||'').toLowerCase().includes(q)) : CADERNO;
+  if(!lista.length){
+    $('listaCad').innerHTML = CADERNO.length
+      ? '<p class="carregando">Nada encontrado com esse termo.</p>'
+      : '<div class="vazio"><span class="big">Caderno vazio</span>Traduza um versículo na aba LER e ele aparece aqui.</div>';
+    return;
+  }
+  $('listaCad').innerHTML = lista.map(t => {
+    const i = CADERNO.indexOf(t);
+    const prev = (t.minha||'').slice(0,110) + ((t.minha||'').length>110?'…':'');
+    const dia = (t.criado_em||'').slice(0,10).split('-').reverse().join('/');
+    return `<div class="itemCad" onclick="verTraducao(${i})">
+      <div class="ref">${t.referencia} · ${dia}</div>
+      <div class="prev">${prev}</div></div>`;
+  }).join('');
+}
+
+function verTraducao(i){
+  const t = CADERNO[i];
+  const hb = t.idioma === 'H';
+  $('detCorpo').innerHTML = `
+    <div class="card">
+      <div class="ref" style="font-family:'Cinzel',serif;color:var(--gold);font-size:calc(12px*var(--e));letter-spacing:.08em">${t.referencia}</div>
+      <div class="lema ${hb?'hbo':'grc'}" style="font-size:calc(26px*var(--e));margin:10px 0;text-align:${hb?'right':'left'}">${t.original||''}</div>
+    </div>
+    <div class="card">
+      <h2>Sua tradução</h2>
+      <p style="margin:0">${t.minha||''}</p>
+      <p class="mini dim" style="margin:10px 0 0">Nível: ${t.nivel||'—'}</p>
+    </div>
+    <div class="card critica">${formatarCritica(t.critica||'')}</div>`;
+  $('listaCad').style.display='none'; $('buscaCad').style.display='none'; $('detalheCad').style.display='block';
+  window.scrollTo(0,0);
+}
+function voltarCaderno(){
+  $('detalheCad').style.display='none'; $('listaCad').style.display='block'; $('buscaCad').style.display='block';
 }
 
 /* ── dados ── */
