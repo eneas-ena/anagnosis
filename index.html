@@ -385,10 +385,24 @@ if('speechSynthesis' in window){
   speechSynthesis.onvoiceschanged = carregarVozes;
   setTimeout(carregarVozes, 400);
 }
+
+function paraVoz(t, idioma){
+  if(!t) return '';
+  if(idioma === 'G'){
+    let d = t.normalize('NFD');
+    d = d.replace(/\u0342/g,'\u0301');          // circunflexo vira agudo (mantem a tonica)
+    d = d.replace(/\u0300/g,'\u0301');          // grave vira agudo
+    d = d.replace(/[\u0313\u0314\u0345]/g,'');  // espiritos e iota subscrito
+    return d.normalize('NFC');
+  }
+  // hebraico: tira cantilacao, preserva o niqqud
+  return t.replace(/[\u0591-\u05AF\u05BD\u05BF\u05C0\u05C3-\u05C6]/g,'').trim();
+}
+
 function falar(texto, idioma){
   if(!('speechSynthesis' in window) || !texto) return;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(texto);
+  const u = new SpeechSynthesisUtterance(paraVoz(texto, idioma));
   if(VOZES[idioma]) u.voice = VOZES[idioma];
   u.lang = idioma==='G' ? 'el-GR' : 'he-IL';
   u.rate = 0.75;
@@ -522,12 +536,59 @@ function traduzMorfema(m){
   return r;
 }
 
+
+const GPOS = {N:'substantivo',A:'adjetivo',T:'artigo',V:'verbo',P:'pronome pessoal',
+  R:'pronome relativo',D:'pronome demonstrativo',I:'pronome interrogativo',
+  X:'pronome indefinido',F:'pronome reflexivo',S:'pronome possessivo',
+  C:'pronome recíproco',K:'pronome correlativo',Q:'pronome correlativo',
+  ADV:'advérbio',CONJ:'conjunção',PREP:'preposição',PRT:'partícula',
+  INJ:'interjeição',COND:'conjunção condicional',ARAM:'termo aramaico',HEB:'termo hebraico'};
+const GCASO = {N:'nominativo',G:'genitivo',D:'dativo',A:'acusativo',V:'vocativo'};
+const GNUM  = {S:'singular',P:'plural'};
+const GGEN  = {M:'masculino',F:'feminino',N:'neutro'};
+const GTMP  = {P:'presente',I:'imperfeito',F:'futuro',A:'aoristo',R:'perfeito',L:'mais-que-perfeito'};
+const GVOZ  = {A:'ativa',M:'média',P:'passiva',E:'média ou passiva',D:'depoente',
+               N:'média ou passiva',O:'passiva depoente'};
+const GMOD  = {I:'indicativo',S:'subjuntivo',O:'optativo',M:'imperativo',
+               N:'infinitivo',P:'particípio',R:'imperativo particípio'};
+
+function traduzGrego(codigo){
+  const c = codigo.replace(/^G/,'').trim();
+  const bl = c.split('-');
+  const pos = GPOS[bl[0]] || GPOS[c] || bl[0];
+
+  if(bl[0] === 'V'){
+    let tvm = (bl[1]||'').replace(/^2/,'');   // 2A = segundo aoristo
+    const seg = (bl[1]||'').startsWith('2');
+    const t = GTMP[tvm[0]]||'', v = GVOZ[tvm[1]]||'', m = GMOD[tvm[2]]||'';
+    let cauda = '';
+    const pn = bl[2]||'';
+    if(m === 'particípio')       cauda = `${GCASO[pn[0]]||''} ${GNUM[pn[1]]||''} ${GGEN[pn[2]]||''}`;
+    else if(/^\d/.test(pn))      cauda = `${pn[0]}ª pessoa ${GNUM[pn[1]]||''}`;
+    return `verbo · ${t}${seg?' (2º)':''} ${v} ${m}${cauda?' · '+cauda:''}`.replace(/\s+/g,' ').trim();
+  }
+
+  const suf = bl[1]||'';
+  if(bl[0]==='P' || bl[0]==='F' || bl[0]==='S'){
+    const pes = /^\d/.test(suf) ? `${suf[0]}ª pessoa ` : '';
+    const r = suf.replace(/^\d/,'');
+    return `${pos} · ${pes}${GCASO[r[0]]||''} ${GNUM[r[1]]||''} ${GGEN[r[2]]||''}`.replace(/\s+/g,' ').trim();
+  }
+  if(suf && GCASO[suf[0]]){
+    return `${pos} · ${GCASO[suf[0]]||''} ${GNUM[suf[1]]||''} ${GGEN[suf[2]]||''}`.replace(/\s+/g,' ').trim();
+  }
+  return pos;
+}
+
 function traduzMorf(codigo){
   if(!codigo) return { texto:'', bruto:'' };
   const bruto = codigo;
+  // grego: formato N-GSF, V-2RAI-1P, T-NSM
+  if(/^G?[A-Z]+-/.test(codigo) || /^(ADV|CONJ|PREP|PRT|INJ|COND)$/.test(codigo.replace(/^G/,''))){
+    try{ return { texto: traduzGrego(codigo), bruto }; }catch(e){ return { texto:'', bruto }; }
+  }
   let c = codigo;
-  const idioma = c[0];
-  if(idioma === 'H' || idioma === 'A' || idioma === 'G') c = c.slice(1);
+  if('HAG'.includes(c[0])) c = c.slice(1);
   const partes = c.split('/').filter(Boolean).map(traduzMorfema).filter(Boolean);
   return { texto: partes.join(' + '), bruto };
 }
