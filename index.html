@@ -428,7 +428,7 @@ textarea:focus{outline:none;border-color:var(--gold)}
 <div class="toast" id="toast"></div>
 
 <script>
-const VERSAO = 'v3.2';
+const VERSAO = 'v3.3';
 const SUPA_URL = 'https://ghjbljypxksubmcsvaig.supabase.co';
 const SUPA_KEY = 'sb_publishable_qXCYqg1WdmelY9D1mptZXg_U8NdoKby';
 const META = { G:500, H:1000 };
@@ -958,13 +958,13 @@ ${duplo ? `\nTRADUÇÃO SUAVE DO ALUNO:\n"${suave}"` : ''}
 Analise agora.`;
 
   const corta = new AbortController();
-  const relogio = setTimeout(() => corta.abort(), 100000);
+  const relogio = setTimeout(() => corta.abort(), 150000);
   try{
     const r = await fetch(CFG.worker, {
       signal: corta.signal,
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        model:'claude-sonnet-5', max_tokens:2000,
+        model:'claude-sonnet-5', max_tokens:8000,
         system:'Você é um professor de exegese bíblica. Responda em português do Brasil.',
         messages:[{ role:'user', content: corpo }]
       })
@@ -974,15 +974,20 @@ Analise agora.`;
     let d; try{ d = JSON.parse(bruto); }
     catch{ throw new Error('resposta não é JSON: ' + bruto.slice(0,300)); }
     if(d.error) throw new Error('a API recusou: ' + JSON.stringify(d.error).slice(0,300));
-    const txt = (d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
-    if(!txt) throw new Error('sem texto na resposta — bruto: ' + bruto.slice(0,400));
+    const blocos = d.content || [];
+    const txt = blocos.filter(b => b.type==='text' && b.text).map(b=>b.text).join('\n').trim();
+    if(!txt){
+      const tipos = blocos.map(b=>b.type).join(', ') || 'nenhum';
+      const motivo = d.stop_reason ? ` (parou por: ${d.stop_reason})` : '';
+      throw new Error(`a resposta veio sem texto${motivo}. Blocos recebidos: ${tipos}.`);
+    }
 
     $('tCritica').innerHTML = formatarCritica(txt);
     await salvarTraducao(dura, suave, txt);
     $('tEnviar').textContent = 'Analisado e guardado';
   }catch(e){
     const msg = e.name === 'AbortError'
-      ? 'A análise passou de 100 segundos e foi interrompida. Tente de novo — ou troque o Worker em Ajustes.'
+      ? 'A análise passou de 150 segundos e foi interrompida. Tente de novo — ou troque o Worker em Ajustes.'
       : e.message;
     $('tCritica').innerHTML = `<p class="dim">Não consegui obter a crítica.<br><span class="mini">${msg}</span></p>`;
     $('tEnviar').disabled = false;
