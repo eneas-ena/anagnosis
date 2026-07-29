@@ -48,6 +48,7 @@ body{
   display:flex;align-items:center;justify-content:center;position:relative;
 }
 .topo h1{font-family:'Cinzel',serif;font-size:calc(19px*var(--e));font-weight:600;color:var(--gold);letter-spacing:.16em;margin:0}
+.versao{font-family:ui-monospace,Menlo,monospace;font-size:calc(10px*var(--e));color:var(--dim);letter-spacing:.04em;margin-left:8px;vertical-align:middle;opacity:.8}
 .tema{
   position:absolute;right:16px;top:calc(14px + env(safe-area-inset-top));
   background:none;border:none;padding:8px;font-size:calc(19px*var(--e));cursor:pointer;line-height:1;
@@ -207,7 +208,7 @@ textarea:focus{outline:none;border-color:var(--gold)}
 <body>
 
 <div class="topo">
-  <h1>ANAGNOSIS</h1>
+  <h1>ANAGNOSIS<span class="versao" id="versao"></span></h1>
   <div class="iconesTopo">
     <button onclick="aba('alfabeto')" title="Alfabeto">Αא</button>
     <button id="btnTema" onclick="trocarTema()" title="Tema">☾</button>
@@ -427,6 +428,7 @@ textarea:focus{outline:none;border-color:var(--gold)}
 <div class="toast" id="toast"></div>
 
 <script>
+const VERSAO = 'v3.2';
 const SUPA_URL = 'https://ghjbljypxksubmcsvaig.supabase.co';
 const SUPA_KEY = 'sb_publishable_qXCYqg1WdmelY9D1mptZXg_U8NdoKby';
 const META = { G:500, H:1000 };
@@ -863,6 +865,8 @@ const COMUM = `Você é um professor de exegese avaliando o trabalho de um aluno
 
 A ficha morfológica abaixo vem de um corpus etiquetado. ANCORE TODA a análise nela. Não invente formas, parsings ou sentidos ausentes dos dados. Se algo for incerto, diga que é incerto.
 
+EXTENSÃO: cada seção deve ter no máximo 4 frases curtas. Seja denso, nunca prolixo. Prefira apontar duas coisas certeiras a listar seis vagas. A resposta inteira não deve passar de 400 palavras.
+
 Tom: direto e específico, sem elogio genérico. Cite o original quando ajudar. Não pressuponha nem promova nenhuma posição teológica ou escola de interpretação — analise o que o texto diz, não o que uma tradição espera que ele diga. Português do Brasil. Sem preâmbulo.`;
 
 const DUAS = COMUM + `
@@ -953,28 +957,37 @@ ${duplo ? `\nTRADUÇÃO SUAVE DO ALUNO:\n"${suave}"` : ''}
 
 Analise agora.`;
 
+  const corta = new AbortController();
+  const relogio = setTimeout(() => corta.abort(), 100000);
   try{
     const r = await fetch(CFG.worker, {
+      signal: corta.signal,
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        model:'claude-sonnet-5', max_tokens:4000,
+        model:'claude-sonnet-5', max_tokens:2000,
         system:'Você é um professor de exegese bíblica. Responda em português do Brasil.',
         messages:[{ role:'user', content: corpo }]
       })
     });
-    if(!r.ok) throw new Error('Worker respondeu ' + r.status);
-    const d = await r.json();
+    const bruto = await r.text();
+    if(!r.ok) throw new Error(`Worker respondeu ${r.status} — ${bruto.slice(0,300)}`);
+    let d; try{ d = JSON.parse(bruto); }
+    catch{ throw new Error('resposta não é JSON: ' + bruto.slice(0,300)); }
+    if(d.error) throw new Error('a API recusou: ' + JSON.stringify(d.error).slice(0,300));
     const txt = (d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
-    if(!txt) throw new Error('resposta vazia');
+    if(!txt) throw new Error('sem texto na resposta — bruto: ' + bruto.slice(0,400));
 
     $('tCritica').innerHTML = formatarCritica(txt);
     await salvarTraducao(dura, suave, txt);
     $('tEnviar').textContent = 'Analisado e guardado';
   }catch(e){
-    $('tCritica').innerHTML = `<p class="dim">Não consegui obter a crítica.<br><span class="mini">${e.message}</span></p>`;
+    const msg = e.name === 'AbortError'
+      ? 'A análise passou de 100 segundos e foi interrompida. Tente de novo — ou troque o Worker em Ajustes.'
+      : e.message;
+    $('tCritica').innerHTML = `<p class="dim">Não consegui obter a crítica.<br><span class="mini">${msg}</span></p>`;
     $('tEnviar').disabled = false;
     $('tEnviar').textContent = 'Tentar de novo';
-  }
+  }finally{ clearTimeout(relogio); }
 }
 
 function formatarCritica(t){
@@ -1260,6 +1273,8 @@ function mostrarResumo(){
     `Dominadas: ${dominadas('G')} em grego, ${dominadas('H')} em hebraico.`;
 }
 
+$('versao').textContent = VERSAO;
+console.log('ANAGNOSIS ' + VERSAO);
 lerCfg();
 carregar();
 </script>
