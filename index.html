@@ -332,8 +332,14 @@ textarea:focus{outline:none;border-color:var(--gold)}
   </div>
   <div class="card" id="tTexto" style="padding:20px 16px"></div>
   <div class="card">
-    <h2>Sua tradução</h2>
-    <textarea id="tMinha" placeholder="Escreva aqui, sem consultar versão nenhuma."></textarea>
+    <h2>Tradução dura</h2>
+    <p class="mini dim" style="margin:0 0 10px">Palavra por palavra, na ordem do original. Não se preocupe com o português — aqui só interessa provar que o senhor analisou cada forma.</p>
+    <textarea id="tDura" placeholder="ὃ ἦν ἀπ᾽ ἀρχῆς → o que era desde princípio…"></textarea>
+  </div>
+  <div class="card">
+    <h2>Tradução suave</h2>
+    <p class="mini dim" style="margin:0 0 10px">Agora olhando para a dura, escreva português que funcione. Deixe em branco se quiser a crítica só da primeira.</p>
+    <textarea id="tSuave" placeholder="Opcional."></textarea>
     <button class="solid largo" style="margin-top:12px" id="tEnviar" onclick="pedirCritica()">Enviar para crítica</button>
   </div>
   <div class="card critica" id="tCritica" style="display:none"></div>
@@ -811,7 +817,7 @@ function abrirTraducao(v){
   TRAD.palavras = CAPATUAL[v] || [];
   TRAD.ref = `${LIVROATUAL.nome} ${$('selCap').value}:${v}`;
   $('tRef').textContent = TRAD.ref;
-  $('tMinha').value = '';
+  $('tDura').value = ''; $('tSuave').value = '';
   $('tCritica').style.display = 'none';
   $('tEnviar').disabled = false;
   $('tEnviar').textContent = 'Enviar para crítica';
@@ -853,46 +859,85 @@ function dossie(){
   }).join('\n');
 }
 
-const INSTRUCAO = `Você é um professor de exegese avaliando a tradução de um aluno adulto e experiente — pastor com formação teológica, retomando as línguas originais depois de anos afastado.
+const COMUM = `Você é um professor de exegese avaliando o trabalho de um aluno adulto e experiente — pastor com formação teológica, retomando as línguas originais depois de anos afastado.
 
-A ficha morfológica abaixo vem de um corpus etiquetado. ANCORE TODA a sua análise nela. Não invente formas, parsings ou sentidos que não estejam nos dados fornecidos. Se algo for incerto, diga que é incerto.
+A ficha morfológica abaixo vem de um corpus etiquetado. ANCORE TODA a análise nela. Não invente formas, parsings ou sentidos ausentes dos dados. Se algo for incerto, diga que é incerto.
 
-Avalie a tradução do aluno em sete seções, cada uma iniciada por "## " seguido do título exato:
+Tom: direto e específico, sem elogio genérico. Cite o original quando ajudar. Não pressuponha nem promova nenhuma posição teológica ou escola de interpretação — analise o que o texto diz, não o que uma tradição espera que ele diga. Português do Brasil. Sem preâmbulo.`;
+
+const DUAS = COMUM + `
+
+O aluno entregou DUAS versões do mesmo versículo:
+
+1. A DURA — palavra por palavra, na ordem do original. Ela é PROPOSITALMENTE desajeitada em português. NUNCA critique o português dela. Ela serve a um único fim: mostrar se o aluno analisou corretamente cada forma.
+
+2. A SUAVE — português que funciona.
+
+O espaço entre as duas é onde mora a exegese. Toda diferença entre elas é uma decisão interpretativa, consciente ou não.
+
+Classifique cada problema por onde ele aparece:
+- Presente NAS DUAS → erro de análise: o aluno leu a forma errado.
+- Presente SÓ NA SUAVE → a análise estava certa, mas algo se perdeu na passagem ao português.
+- Presente SÓ NA DURA → em geral não é problema; a dura pode ser áspera.
+
+Responda em sete seções, cada uma iniciada por "## " com o título exato:
 
 ## Leitura geral
-Duas ou três frases sobre se a tradução funciona como português e se o sentido central foi captado.
+Duas ou três frases sobre o conjunto do trabalho.
 
-## Escolhas lexicais
-Onde cada palavra escolhida cai dentro da amplitude semântica do termo original. O que outra escolha mudaria.
+## A tradução dura
+A análise morfológica está correta? Tempo, aspecto, voz, modo, caso, estado construto — o que o aluno acertou e o que leu errado. Julgue só a análise, jamais o estilo.
 
-## Morfologia
-O tempo, aspecto, voz e modo foram honrados? Aoristo, perfeito, particípio, wayyiqtol, estado construto — o que sobreviveu e o que se perdeu.
+## O que mudou na passagem
+Aponte as diferenças concretas entre a dura e a suave, uma a uma.
 
-## Sintaxe
-Relações entre as palavras: genitivo subjetivo ou objetivo, função dos particípios, encadeamento das orações.
+## As decisões que isso revela
+Para cada diferença, diga que decisão interpretativa ela representa e que consequência tem. Destaque as que o aluno provavelmente tomou sem perceber.
 
-## Acréscimos e omissões
-O que o aluno pôs e não está no original; o que está no original e sumiu — partículas, pronomes enfáticos, ordem enfática das palavras.
+## Erros que atravessaram as duas
+Problemas presentes na dura e repetidos na suave — são erros de leitura, não de estilo. Se não houver, diga que não houve.
 
 ## Onde os tradutores divergem
 Pontos deste versículo em que versões respeitáveis discordam legitimamente, e com que consequência.
 
 ## A decisão mais frágil
-OBRIGATÓRIO. Aponte sempre a escolha mais vulnerável da tradução, mesmo quando o conjunto estiver bom. Nunca escreva que está tudo perfeito. Se a tradução for excelente, aponte a decisão que um revisor questionaria primeiro. Esta seção jamais pode ser omitida ou suavizada.
+OBRIGATÓRIO. Aponte sempre a escolha mais vulnerável, mesmo quando o conjunto estiver bom. Nunca escreva que está tudo perfeito. Se o trabalho for excelente, aponte o que um revisor questionaria primeiro. Esta seção jamais pode ser omitida nem suavizada.
 
-Regras de tom: seja direto e específico, sem elogio genérico. Cite o texto original quando for útil. Não pressuponha nem promova nenhuma posição teológica ou escola de interpretação — analise o que o texto diz, não o que uma tradição espera que ele diga. Português do Brasil. Sem preâmbulo: comece direto em "## Leitura geral".`;
+Comece direto em "## Leitura geral".`;
+
+const UMA = COMUM + `
+
+O aluno entregou UMA tradução de trabalho — palavra por palavra, na ordem do original. Ela é PROPOSITALMENTE desajeitada em português. NUNCA critique o estilo dela: julgue apenas se a análise morfológica está correta.
+
+Responda em seis seções, cada uma iniciada por "## " com o título exato:
+
+## Leitura geral
+## Fidelidade à análise
+Tempo, aspecto, voz, modo, caso, estado construto — o que sobreviveu e o que foi lido errado.
+## Escolhas lexicais
+Onde cada palavra cai dentro da amplitude semântica do original.
+## Acréscimos e omissões
+## Onde os tradutores divergem
+## A decisão mais frágil
+OBRIGATÓRIO. Aponte sempre a escolha mais vulnerável, mesmo quando o conjunto estiver bom. Nunca escreva que está tudo perfeito. Esta seção jamais pode ser omitida nem suavizada.
+
+Comece direto em "## Leitura geral".`;
 
 async function pedirCritica(){
-  const minha = $('tMinha').value.trim();
-  if(minha.length < 8) return toast('Escreva sua tradução antes de enviar.');
+  const dura  = $('tDura').value.trim();
+  const suave = $('tSuave').value.trim();
+  if(dura.length < 8) return toast('Escreva ao menos a tradução dura.');
+  const duplo = suave.length >= 8;
 
   $('tEnviar').disabled = true;
   $('tEnviar').textContent = 'Analisando…';
   $('tCritica').style.display = 'block';
-  $('tCritica').innerHTML = '<p class="carregando">Lendo sua tradução decisão por decisão…</p>';
+  $('tCritica').innerHTML = duplo
+    ? '<p class="carregando">Comparando as duas versões, decisão por decisão…</p>'
+    : '<p class="carregando">Lendo sua análise, forma por forma…</p>';
 
   const idioma = (LIVROATUAL && LIVROATUAL.idioma !== 'grc') ? 'Hebraico bíblico' : 'Grego koiné';
-  const corpo = `${INSTRUCAO}
+  const corpo = `${duplo ? DUAS : UMA}
 
 ---
 REFERÊNCIA: ${TRAD.ref}
@@ -902,8 +947,9 @@ TEXTO ORIGINAL: ${textoOriginal()}
 FICHA MORFOLÓGICA (palavra por palavra, na ordem do original):
 ${dossie()}
 
-TRADUÇÃO DO ALUNO:
-"${minha}"
+TRADUÇÃO DURA DO ALUNO:
+"${dura}"
+${duplo ? `\nTRADUÇÃO SUAVE DO ALUNO:\n"${suave}"` : ''}
 
 Analise agora.`;
 
@@ -911,7 +957,7 @@ Analise agora.`;
     const r = await fetch(CFG.worker, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        model:'claude-sonnet-5', max_tokens:3000,
+        model:'claude-sonnet-5', max_tokens:4000,
         system:'Você é um professor de exegese bíblica. Responda em português do Brasil.',
         messages:[{ role:'user', content: corpo }]
       })
@@ -922,7 +968,7 @@ Analise agora.`;
     if(!txt) throw new Error('resposta vazia');
 
     $('tCritica').innerHTML = formatarCritica(txt);
-    await salvarTraducao(minha, txt);
+    await salvarTraducao(dura, suave, txt);
     $('tEnviar').textContent = 'Analisado e guardado';
   }catch(e){
     $('tCritica').innerHTML = `<p class="dim">Não consegui obter a crítica.<br><span class="mini">${e.message}</span></p>`;
@@ -948,7 +994,7 @@ function formatarCritica(t){
   return h;
 }
 
-async function salvarTraducao(minha, critica){
+async function salvarTraducao(dura, suave, critica){
   try{
     await fetch(`${SUPA_URL}/rest/v1/traducoes`, {
       method:'POST', headers:{...H(), Prefer:'return=minimal'},
@@ -956,7 +1002,7 @@ async function salvarTraducao(minha, critica){
         idioma: (LIVROATUAL.idioma!=='grc') ? 'H' : 'G',
         livro: LIVROATUAL.livro, referencia: TRAD.ref,
         cap: +$('selCap').value, vers: TRAD.vers, nivel: TRAD.nivel,
-        original: textoOriginal(), minha, critica
+        original: textoOriginal(), minha:dura, suave: suave||null, critica
       }])});
     CADERNO = [];
   }catch(e){ toast('A crítica saiu, mas não consegui guardar no caderno.'); }
@@ -987,7 +1033,8 @@ function pintarCaderno(){
   }
   $('listaCad').innerHTML = lista.map(t => {
     const i = CADERNO.indexOf(t);
-    const prev = (t.minha||'').slice(0,110) + ((t.minha||'').length>110?'…':'');
+    const base = t.suave || t.minha || '';
+    const prev = base.slice(0,110) + (base.length>110?'…':'');
     const dia = (t.criado_em||'').slice(0,10).split('-').reverse().join('/');
     return `<div class="itemCad" onclick="verTraducao(${i})">
       <div class="ref">${t.referencia} · ${dia}</div>
@@ -1004,10 +1051,11 @@ function verTraducao(i){
       <div class="lema ${hb?'hbo':'grc'}" style="font-size:calc(26px*var(--e));margin:10px 0;text-align:${hb?'right':'left'}">${t.original||''}</div>
     </div>
     <div class="card">
-      <h2>Sua tradução</h2>
+      <h2>Tradução dura</h2>
       <p style="margin:0">${t.minha||''}</p>
-      <p class="mini dim" style="margin:10px 0 0">Nível: ${t.nivel||'—'}</p>
     </div>
+    ${t.suave ? `<div class="card"><h2>Tradução suave</h2><p style="margin:0">${t.suave}</p></div>` : ''}
+    <div class="card"><p class="mini dim" style="margin:0">Nível de apoio: ${t.nivel||'—'}</p></div>
     <div class="card critica">${formatarCritica(t.critica||'')}</div>`;
   $('listaCad').style.display='none'; $('buscaCad').style.display='none'; $('detalheCad').style.display='block';
   window.scrollTo(0,0);
