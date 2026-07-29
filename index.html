@@ -17,40 +17,40 @@
 :root{
   --navy:#0F1B33; --navy-2:#0E1A2F; --navy-3:#16243F; --navy-4:#1D2E4D;
   --gold:#C9A227; --ink:#EAE6DA; --dim:#93A0B4;
-  --linha:rgba(201,162,39,.20);
+  --linha:rgba(201,162,39,.20); --e:1.25;
   --grc:#7FA8D8; --hbo:#D8A87F;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{
   background:var(--navy); color:var(--ink);
-  font-family:'Cormorant Garamond',Georgia,serif; font-size:18px; line-height:1.55;
+  font-family:'Cormorant Garamond',Georgia,serif; font-size:calc(18px*var(--e)); line-height:1.6;
   padding-bottom:calc(74px + env(safe-area-inset-bottom));
   -webkit-font-smoothing:antialiased;
 }
 .topo{padding:calc(16px + env(safe-area-inset-top)) 20px 12px;border-bottom:1px solid var(--linha);text-align:center}
-.topo h1{font-family:'Cinzel',serif;font-size:19px;font-weight:600;color:var(--gold);letter-spacing:.16em;margin:0}
-.tela{display:none;padding:20px 18px;max-width:640px;margin:0 auto}
+.topo h1{font-family:'Cinzel',serif;font-size:calc(19px*var(--e));font-weight:600;color:var(--gold);letter-spacing:.16em;margin:0}
+.tela{display:none;padding:22px 18px;max-width:760px;margin:0 auto}
 .tela.on{display:block}
-h2{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--gold);letter-spacing:.11em;text-transform:uppercase;margin:0 0 12px}
+h2{font-family:'Cinzel',serif;font-size:calc(13.5px*var(--e));font-weight:600;color:var(--gold);letter-spacing:.11em;text-transform:uppercase;margin:0 0 12px}
 .card{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:18px 20px;margin-bottom:16px}
-.dim{color:var(--dim)} .mini{font-size:14px}
+.dim{color:var(--dim)} .mini{font-size:calc(14.5px*var(--e))}
 
 .metas{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .meta{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:14px 16px}
-.meta span{display:block;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.09em;color:var(--dim);text-transform:uppercase}
-.meta b{display:block;font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.25}
+.meta span{display:block;font-family:'Cinzel',serif;font-size:calc(11.5px*var(--e));letter-spacing:.09em;color:var(--dim);text-transform:uppercase}
+.meta b{display:block;font-size:calc(30px*var(--e));font-weight:600;font-variant-numeric:tabular-nums;line-height:1.25}
 .meta.g b{color:var(--grc)} .meta.h b{color:var(--hbo)}
 
 .trilha{margin-bottom:14px}
-.trilha .rot{display:flex;justify-content:space-between;font-size:14px;margin-bottom:5px}
+.trilha .rot{display:flex;justify-content:space-between;font-size:calc(15px*var(--e));margin-bottom:5px}
 .raia{height:7px;background:var(--navy-3);border-radius:99px;overflow:hidden}
 .raia i{display:block;height:100%;width:0;border-radius:99px;transition:width .4s}
 .raia i.g{background:var(--grc)} .raia i.h{background:var(--hbo)}
 
 button{
-  font-family:'Cinzel',serif;font-size:13.5px;letter-spacing:.07em;
-  padding:13px 20px;border-radius:8px;cursor:pointer;
+  font-family:'Cinzel',serif;font-size:calc(13.5px*var(--e));letter-spacing:.07em;
+  padding:15px 20px;border-radius:8px;cursor:pointer;
   background:transparent;color:var(--gold);border:1px solid var(--gold);transition:background .15s;
 }
 button:active{background:rgba(201,162,39,.15)}
@@ -60,36 +60,36 @@ button.largo{width:100%}
 button.suave{border-color:var(--linha);color:var(--dim)}
 
 .abas{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--navy-2);border-top:1px solid var(--linha);padding-bottom:env(safe-area-inset-bottom);z-index:20}
-.abas button{flex:1;border:none;border-radius:0;background:transparent;color:var(--dim);font-size:11.5px;letter-spacing:.09em;padding:16px 4px}
+.abas button{flex:1;border:none;border-radius:0;background:transparent;color:var(--dim);font-size:calc(11.5px*var(--e));letter-spacing:.09em;padding:16px 4px}
 .abas button.on{color:var(--gold);box-shadow:inset 0 2px 0 var(--gold)}
 
-.lema{font-size:52px;line-height:1.5;text-align:center;margin:12px 0 6px;word-break:break-word}
-.lema.hbo{font-family:'Frank Ruhl Libre','SBL Hebrew','Times New Roman',serif;direction:rtl;font-size:56px}
+.lema{font-size:calc(50px*var(--e));line-height:1.5;text-align:center;margin:12px 0 6px;word-break:break-word}
+.lema.hbo{font-family:'Frank Ruhl Libre','SBL Hebrew','Times New Roman',serif;direction:rtl;font-size:calc(54px*var(--e))}
 .lema.grc{font-family:'Cormorant Garamond','Noto Serif',serif}
-.tr{text-align:center;font-style:italic;color:var(--dim);font-size:19px;margin-bottom:4px}
-.glosa{text-align:center;font-size:26px;margin:14px 0 6px}
-.cat{text-align:center;font-size:14px;color:var(--dim);letter-spacing:.05em}
-.nota{margin:16px 0 0;padding:10px 14px;border-left:2px solid var(--gold);font-size:15px;color:var(--dim);font-style:italic}
-.selo{display:inline-block;font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:.1em;padding:4px 10px;border-radius:99px;border:1px solid var(--linha);color:var(--dim)}
+.tr{text-align:center;font-style:italic;color:var(--dim);font-size:calc(19px*var(--e));margin-bottom:4px}
+.glosa{text-align:center;font-size:calc(26px*var(--e));margin:14px 0 6px}
+.cat{text-align:center;font-size:calc(14.5px*var(--e));color:var(--dim);letter-spacing:.05em}
+.nota{margin:16px 0 0;padding:10px 14px;border-left:2px solid var(--gold);font-size:calc(15px*var(--e));color:var(--dim);font-style:italic}
+.selo{display:inline-block;font-family:'Cinzel',serif;font-size:calc(11px*var(--e));letter-spacing:.1em;padding:4px 10px;border-radius:99px;border:1px solid var(--linha);color:var(--dim)}
 .selo.g{color:var(--grc);border-color:rgba(127,168,216,.4)}
 .selo.h{color:var(--hbo);border-color:rgba(216,168,127,.4)}
 
 .notas{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
-.notas button{padding:15px 6px;font-size:12.5px}
+.notas button{padding:17px 6px;font-size:calc(12.5px*var(--e))}
 .n0{border-color:rgba(180,84,78,.55);color:#d98884}
 .n3{border-color:rgba(201,162,39,.4)}
 .n5{border-color:rgba(78,154,107,.55);color:#7fc498}
 
-.contador{display:flex;justify-content:center;gap:18px;font-size:13px;color:var(--dim);margin-bottom:14px;font-variant-numeric:tabular-nums}
-label{display:block;font-family:'Cinzel',serif;font-size:11.5px;letter-spacing:.07em;color:var(--dim);text-transform:uppercase;margin:0 0 6px}
-select{width:100%;padding:11px 12px;background:var(--navy-3);color:var(--ink);border:1px solid var(--linha);border-radius:8px;font-family:inherit;font-size:16px}
+.contador{display:flex;justify-content:center;gap:20px;font-size:calc(13.5px*var(--e));color:var(--dim);margin-bottom:14px;font-variant-numeric:tabular-nums}
+label{display:block;font-family:'Cinzel',serif;font-size:calc(12px*var(--e));letter-spacing:.07em;color:var(--dim);text-transform:uppercase;margin:0 0 6px}
+select{width:100%;padding:11px 12px;background:var(--navy-3);color:var(--ink);border:1px solid var(--linha);border-radius:8px;font-family:inherit;font-size:calc(16px*var(--e))}
 select:focus{outline:none;border-color:var(--gold)}
 .campo{margin-bottom:16px}
 .vazio{text-align:center;padding:44px 20px;color:var(--dim)}
-.vazio .big{display:block;font-family:'Cinzel',serif;font-size:17px;color:var(--gold);letter-spacing:.08em;margin-bottom:8px}
+.vazio .big{display:block;font-family:'Cinzel',serif;font-size:calc(17px*var(--e));color:var(--gold);letter-spacing:.08em;margin-bottom:8px}
 .carregando{text-align:center;padding:60px 20px;color:var(--dim);font-style:italic}
-.aviso{font-size:15px;color:var(--dim);border-left:2px solid var(--gold);padding-left:14px;margin:0 0 16px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom));background:var(--navy-4);border:1px solid var(--linha);border-radius:8px;padding:11px 18px;font-size:15px;z-index:60;opacity:0;transition:opacity .25s;pointer-events:none;max-width:88%;text-align:center}
+.aviso{font-size:calc(15px*var(--e));color:var(--dim);border-left:2px solid var(--gold);padding-left:14px;margin:0 0 16px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom));background:var(--navy-4);border:1px solid var(--linha);border-radius:8px;padding:12px 18px;font-size:calc(15px*var(--e));z-index:60;opacity:0;transition:opacity .25s;pointer-events:none;max-width:88%;text-align:center}
 .toast.on{opacity:1}
 </style>
 </head>
@@ -130,7 +130,7 @@ select:focus{outline:none;border-color:var(--gold)}
     <div class="card">
       <h2>Constância</h2>
       <div style="display:flex;align-items:baseline;gap:10px">
-        <b style="font-size:34px;font-weight:600;color:var(--gold);font-variant-numeric:tabular-nums" id="seq">0</b>
+        <b style="font-size:calc(34px*var(--e));font-weight:600;color:var(--gold);font-variant-numeric:tabular-nums" id="seq">0</b>
         <span class="dim">dias seguidos</span>
       </div>
       <p class="mini dim" style="margin:10px 0 0" id="seqNota">Nenhum estudo registrado ainda.</p>
@@ -191,6 +191,21 @@ select:focus{outline:none;border-color:var(--gold)}
 
 <div class="tela" id="t-ajustes">
   <div class="card">
+    <h2>Leitura</h2>
+    <div class="campo" style="margin-bottom:0">
+      <label>Tamanho do texto</label>
+      <select id="cfgEscala" onchange="salvarCfg()">
+        <option value="1">Pequeno</option>
+        <option value="1.15">Médio</option>
+        <option value="1.25">Grande</option>
+        <option value="1.4">Maior</option>
+        <option value="1.6">Muito grande</option>
+      </select>
+      <p class="mini dim" style="margin:8px 0 0">Vale para todo o app, inclusive no celular.</p>
+    </div>
+  </div>
+
+  <div class="card">
     <h2>Ritmo</h2>
     <div class="campo">
       <label>Trilha ativa</label>
@@ -242,7 +257,7 @@ const hoje = () => new Date().toISOString().slice(0,10);
 const somaDias = (d,n) => { const x = new Date(d+'T12:00:00'); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); };
 
 let LEMAS = [], PROG = {}, SEQ = 0;
-let CFG = { trilha:'G', novas:8 };
+let CFG = { trilha:'G', novas:8, escala:1.25 };
 let fila = [], atual = null, feitos = 0;
 let dFila = [], dPos = 0, dResp = [];
 
@@ -257,9 +272,14 @@ function aba(nome){
   if(nome==='ajustes') mostrarResumo();
 }
 
+function aplicarEscala(){
+  document.documentElement.style.setProperty('--e', CFG.escala);
+}
 function salvarCfg(){
   CFG.trilha = $('cfgTrilha').value;
   CFG.novas  = +$('cfgNovas').value;
+  CFG.escala = +$('cfgEscala').value;
+  aplicarEscala();
   try{ localStorage.setItem('anagnosis_cfg', JSON.stringify(CFG)); }catch(e){}
   pintarHoje();
 }
@@ -267,6 +287,8 @@ function lerCfg(){
   try{ const c = JSON.parse(localStorage.getItem('anagnosis_cfg')); if(c) CFG = {...CFG, ...c}; }catch(e){}
   $('cfgTrilha').value = CFG.trilha;
   $('cfgNovas').value  = CFG.novas;
+  $('cfgEscala').value = CFG.escala;
+  aplicarEscala();
 }
 
 async function pegarTudo(tabela, campos){
