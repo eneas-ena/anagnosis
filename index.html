@@ -170,6 +170,7 @@ select:focus{outline:none;border-color:var(--gold)}
 
 /* tradução e caderno */
 .iconesTopo{position:absolute;right:12px;top:calc(14px + env(safe-area-inset-top));display:flex;gap:2px}
+@media (max-width:520px){ .topo{text-align:left!important;justify-content:flex-start!important;padding-left:16px!important} .topo h1{font-size:calc(16px*var(--e))} .topo h1 .versao{display:block;margin:2px 0 0} .iconesTopo{gap:0} .iconesTopo button{padding:8px 6px!important} }
 .iconesTopo button{background:none;border:none;padding:8px 9px;font-size:calc(18px*var(--e));cursor:pointer;line-height:1;color:var(--gold);font-family:'Cormorant Garamond',serif}
 .niveis{display:flex;gap:7px;margin-bottom:16px}
 .niveis button{flex:1;padding:11px 4px;font-size:calc(11px*var(--e));border-color:var(--linha);color:var(--dim)}
@@ -204,6 +205,7 @@ textarea:focus{outline:none;border-color:var(--gold)}
 
 
 </style>
+<script src="porteiro.js" data-app="ANAGNOSIS" data-versao="3.4" data-protege="https://promptflow-ia.eneaspr.workers.dev"></script>
 </head>
 <body>
 
@@ -212,6 +214,8 @@ textarea:focus{outline:none;border-color:var(--gold)}
   <div class="iconesTopo">
     <button onclick="aba('alfabeto')" title="Alfabeto">Αא</button>
     <button id="btnTema" onclick="trocarTema()" title="Tema">☾</button>
+    <button onclick="porteiroAtualizar()" title="Atualizar app" aria-label="Atualizar app">⟳</button>
+    <button onclick="porteiroSair()" title="Sair da conta" aria-label="Sair da conta" style="font-size:.7rem">Sair</button>
   </div>
 </div>
 
@@ -428,7 +432,7 @@ textarea:focus{outline:none;border-color:var(--gold)}
 <div class="toast" id="toast"></div>
 
 <script>
-const VERSAO = 'v3.3';
+const VERSAO = 'v3.4';
 const SUPA_URL = 'https://ghjbljypxksubmcsvaig.supabase.co';
 const SUPA_KEY = 'sb_publishable_qXCYqg1WdmelY9D1mptZXg_U8NdoKby';
 const META = { G:500, H:1000 };
